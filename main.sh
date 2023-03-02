@@ -310,19 +310,18 @@ rootInstall()
 while [ "\$(getprop sys.boot_completed | tr -d '\r')" != "1" ]; do sleep 1; done
 
 installedAppVer=\$(dumpsys package $pkgName | grep versionName | cut -d '=' -f 2 | sed -n '1p')
-if [ "\$installedAppVer" =  "$selectedVer" ]; then
+{ echo "installedAppVer=\$installedAppVer"; echo "revancedAppVer=$selectedVer" } > /storage/emulated/0/Revancify/rebootlog.txt
+if [ "\$installedAppVer" ==  "$selectedVer" ]; then
     base_path="/data/adb/revanced/$pkgName.apk"
     stock_path="\$(pm path $pkgName | sed -n '/base/s/package://p')"
     {
-        echo "installedAppVer=\$installedAppVer"
-        echo "revancedAppVer=$selectedVer"
         echo "base_path=\$base_path"
         echo "stock_path=\$stock_path"
         chmod -v 644 "\$base_path"
         chown -v system:system "\$base_path"
         chcon -v u:object_r:apk_data_file:s0 "\$base_path"
         mount -vo bind "\$base_path" "\$stock_path"
-    } > /storage/emulated/0/Revancify/rebootlog.txt
+    } >> /storage/emulated/0/Revancify/rebootlog.txt
 fi
 EOF
     su -c "mv mount_revanced_$pkgName.sh /data/adb/service.d/ && chmod +x /data/adb/service.d/mount_revanced_$pkgName.sh"
