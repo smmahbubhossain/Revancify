@@ -298,7 +298,7 @@ rootInstall()
         su -c pm install --user 0 -i com.android.vending -r -d "$appName"-"$appVer".apk > /dev/null 2>&1
     fi
     "${header[@]}" --infobox "Mounting $appName Revanced on stock app..." 12 40
-    su -mm -c "grep $pkgName /proc/mounts | cut -d ' ' -f 2 | sed 's/apk.*/apk/' | xargs -r umount -vl && cp ./$appName-Revanced-$appVer.apk /data/local/tmp/revanced.delete && mv /data/local/tmp/revanced.delete /data/adb/revanced/$pkgName.apk && stockApp=\$(pm path $pkgName | sed -n '/base/s/package://p') && revancedApp=/data/adb/revanced/$pkgName.apk && chmod -v 644 \"\$revancedApp\" && chown -v system:system \$revancedApp && chcon -v u:object_r:apk_data_file:s0 \"\$revancedApp\" && mount -vo bind \"\$revancedApp\" \"\$stockApp\" && am force-stop $pkgName" > "$storagePath/Revancify/mountlog.txt" 2>&1
+    ( su -mm -c "grep $pkgName /proc/mounts | cut -d ' ' -f 2 | sed 's/apk.*/apk/' | xargs -r umount -vl && cp ./$appName-Revanced-$appVer.apk /data/local/tmp/revanced.delete && mv /data/local/tmp/revanced.delete /data/adb/revanced/$pkgName.apk && stockApp=\$(pm path $pkgName | sed -n '/base/s/package://p') && revancedApp=/data/adb/revanced/$pkgName.apk && chmod -v 644 \"\$revancedApp\" && chown -v system:system \$revancedApp && chcon -v u:object_r:apk_data_file:s0 \"\$revancedApp\" && mount -vo bind \"\$revancedApp\" \"\$stockApp\" && am force-stop $pkgName" ) > "$storagePath/Revancify/mountlog.txt" 2>&1
     if ! su -c "grep -q $pkgName /proc/mounts"
     then
         "${header[@]}" --infobox "Mount Failed !!\nLogs saved to Revancify folder. Share the Mountlog to developer." 12 40
@@ -310,17 +310,13 @@ rootInstall()
 while [ "\$(getprop sys.boot_completed | tr -d '\r')" != "1" ]; do sleep 1; done
 
 installedAppVer=\$(dumpsys package $pkgName | grep versionName | cut -d '=' -f 2 | sed -n '1p')
-echo "installedAppVer=\$installedAppVer"
-echo "revancedAppVer=$selectedVer"
 if [ "\$installedAppVer" =  "$selectedVer" ]; then
     base_path="/data/adb/revanced/$pkgName.apk"
     stock_path="\$(pm path $pkgName | sed -n '/base/s/package://p')"
-    echo "base_path=\$base_path"
-    echo "stock_path=\$stock_path"
-    chmod -v 644 "\$base_path"
-    chown -v system:system "\$base_path"
-    chcon -v u:object_r:apk_data_file:s0 "\$base_path"
-    mount -v -o bind "\$base_path" "\$stock_path"
+    chmod 644 "\$base_path"
+    chown system:system "\$base_path"
+    chcon u:object_r:apk_data_file:s0 "\$base_path"
+    mount -o bind "\$base_path" "\$stock_path"
 fi
 EOF
     su -c "mv mount_revanced_$pkgName.sh /data/adb/service.d/ && chmod +x /data/adb/service.d/mount_revanced_$pkgName.sh"
