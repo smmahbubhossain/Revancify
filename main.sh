@@ -318,6 +318,8 @@ if [ "\$installedAppVer" =  "$selectedVer" ]; then
         echo "revancedAppVer=$selectedVer"
         echo "base_path=\$base_path"
         echo "stock_path=\$stock_path"
+        chmod -v 644 "\$base_path"
+        chown -v system:system "\$base_path"
         chcon -v u:object_r:apk_data_file:s0 "\$base_path"
         mount -vo bind "\$base_path" "\$stock_path"
     } > /storage/emulated/0/Revancify/rebootlog.txt
