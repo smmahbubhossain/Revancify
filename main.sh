@@ -305,7 +305,7 @@ rootInstall()
         sleep 1
         mainmenu
     fi
-    su -c cat << EOF > "/data/adb/service.d/mount_revanced_$pkgName.sh"
+    cat << EOF > "mount_revanced_$pkgName.sh"
 #!/system/bin/sh
 while [ "\$(getprop sys.boot_completed | tr -d '\r')" != "1" ]; do sleep 1; done
 
@@ -323,7 +323,7 @@ if [ "\$installedAppVer" =  "$selectedVer" ]; then
     } > /storage/emulated/0/Revancify/rebootlog.txt
 fi
 EOF
-    su -c "chmod +x /data/adb/service.d/mount_revanced_$pkgName.sh"
+    su -c "mv mount_revanced_$pkgName.sh /data/adb/service.d/ && chmod +x /data/adb/service.d/mount_revanced_$pkgName.sh"
     sleep 1
     su -c "settings list secure | sed -n -e 's/\/.*//' -e 's/default_input_method=//p' | xargs pidof | xargs kill -9 && pm resolve-activity --brief $pkgName | tail -n 1 | xargs am start -n && pidof com.termux | xargs kill -9" > /dev/null 2>&1
 }
