@@ -319,8 +319,7 @@ rootUninstall()
         extrasMenu
     fi
     "${header[@]}" --infobox "Uninstalling $appName Revanced by Unmounting..." 12 40
-    pkgName=$pkgName su -mm -c 'grep $pkgName /proc/mounts | cut -d " " -f 2 | sed "s/apk.*/apk/" | xargs -r umount -l &&\
-    stockApp=$(pm path $pkgName | sed -n "/base/s/package://p") && am force-stop $pkgName && rm /data/adb/service.d/mount_revanced_$pkgName.sh && rm -rf /data/adb/revanced/$pkgName.apk' > /dev/null 2>&1
+    su -mm -c "grep $pkgName /proc/mounts | cut -d ' ' -f 2 | sed 's/apk.*/apk/' | xargs -r umount -l && am force-stop $pkgName && rm /data/adb/service.d/mount_revanced_$pkgName.sh && rm -rf /data/adb/revanced/$pkgName.apk" > /dev/null 2>&1
     sleep 0.5s
     if ! su -c "grep -q $pkgName /proc/mounts"
     then
