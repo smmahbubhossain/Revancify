@@ -298,7 +298,7 @@ rootInstall()
         su -c pm install --user 0 -i com.android.vending -r -d "$appName"-"$appVer".apk > /dev/null 2>&1
     fi
     "${header[@]}" --infobox "Mounting $appName Revanced on stock app..." 12 40
-    su -mm -c "stockApp=\$(pm path $pkgName | sed -n '/base/s/package://p') && { grep $pkgName /proc/mounts | cut -d ' ' -f 2 | sed 's/apk.*/apk/' | xargs -r umount -vl && cp ./$appName-Revanced-$appVer.apk /data/local/tmp/revanced.delete && mv /data/local/tmp/revanced.delete /data/adb/revanced/$pkgName.apk && revancedApp=/data/adb/revanced/$pkgName.apk && chmod -v 644 \"\$revancedApp\" && chown -v system:system \$revancedApp && chcon -v u:object_r:apk_data_file:s0 \"\$revancedApp\" && mount -vo bind \"\$revancedApp\" \"\$stockApp\" && am force-stop $pkgName;} > "$storagePath/Revancify/mountlog.txt" 2>&1"
+    su -mm -c "stockApp=\$(pm path $pkgName | sed -n '/base/s/package://p') && { grep $pkgName /proc/mounts | cut -d ' ' -f 2 | sed 's/apk.*/apk/' | xargs -r umount -vl && cp ./$appName-Revanced-$appVer.apk /data/local/tmp/revanced.delete && mv /data/local/tmp/revanced.delete /data/adb/revanced/$pkgName.apk && revancedApp=/data/adb/revanced/$pkgName.apk && chmod -v 644 \"\$revancedApp\" && chown -v system:system \$revancedApp && chcon -v u:object_r:apk_data_file:s0 \"\$revancedApp\" && mount -vo bind \"\$revancedApp\" \"\$stockApp\" && am force-stop $pkgName; echo;} > "$storagePath/Revancify/mountlog.txt" 2>&1"
     if ! su -c "grep -q $pkgName /proc/mounts"
     then
         "${header[@]}" --infobox "Mount Failed !!\nLogs saved to Revancify folder. Share the Mountlog to developer." 12 40
