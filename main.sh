@@ -325,7 +325,12 @@ fi
 EOF
     su -c "mv mount_revanced_$pkgName.sh /data/adb/service.d/ && chmod +x /data/adb/service.d/mount_revanced_$pkgName.sh"
     sleep 1
-    su -c "settings list secure | sed -n -e 's/\/.*//' -e 's/default_input_method=//p' | xargs pidof | xargs kill -9 && pm resolve-activity --brief $pkgName | tail -n 1 | xargs am start -n && pidof com.termux | xargs kill -9" > /dev/null 2>&1
+    if "${header[@]}" --begin 2 0 --title '| Apk Not Installed |' --no-items --keep-window --yesno "App Mounted Successfully !!\nDo you want to launch app??" -1 -1
+    then
+        su -c "settings list secure | sed -n -e 's/\/.*//' -e 's/default_input_method=//p' | xargs pidof | xargs kill -9 && pm resolve-activity --brief $pkgName | tail -n 1 | xargs am start -n && pidof com.termux | xargs kill -9" > /dev/null 2>&1
+    else
+        mainmenu
+    fi
 }
 
 rootUninstall()
