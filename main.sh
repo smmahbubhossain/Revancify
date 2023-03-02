@@ -312,7 +312,7 @@ while [ "\$(getprop sys.boot_completed | tr -d '\r')" != "1" ]; do sleep 1; done
 installedAppVer=\$(dumpsys package $pkgName | grep versionName | cut -d '=' -f 2 | sed -n '1p')
 echo "installedAppVer=\$installedAppVer"
 echo "revancedAppVer=$selectedVer"
-if [ "\$installedAppVer" ==  "$selectedVer" ]; then
+if [ "\$installedAppVer" =  "$selectedVer" ]; then
     base_path="/data/adb/revanced/$pkgName.apk"
     stock_path="\$(pm path $pkgName | sed -n '/base/s/package://p')"
     echo "base_path=\$base_path"
