@@ -8,6 +8,7 @@ terminate()
 }
 trap terminate SIGTERM SIGINT SIGABRT
 
+# shellcheck source=/dev/null
 
 setup()
 {
@@ -304,8 +305,25 @@ rootInstall()
         sleep 1
         mainmenu
     fi
-    echo -e "#!/system/bin/sh\nwhile [ \"\$(getprop sys.boot_completed | tr -d '\\\r')\" != \"1\" ]; do sleep 1; done\n\nif [ \"\$(dumpsys package $pkgName | grep versionName | cut -d '=' -f 2 | sed -n '1p')\" =  \"$selectedVer\" ]; then\n  base_path=\"/data/adb/revanced/$pkgName.apk\"\n  stock_path=\"\$(pm path $pkgName | sed -n '/base/s/package://p')\"\n  chcon u:object_r:apk_data_file:s0 \"\$base_path\"\n  mount -o bind \"\$base_path\" \"\$stock_path\"\nfi" > "mount_revanced_$pkgName.sh"
-    su -c "mv mount_revanced_$pkgName.sh /data/adb/service.d && chmod +x /data/adb/service.d/mount_revanced_$pkgName.sh"
+    cat << EOF > "/data/adb/service.d/mount_revanced_$pkgName.sh"
+#!/system/bin/sh
+while [ "\$(getprop sys.boot_completed | tr -d '\r')" != "1" ]; do sleep 1; done
+
+installedAppVer=\$(dumpsys package $pkgName | grep versionName | cut -d '=' -f 2 | sed -n '1p')
+if [ "\$installedAppVer" =  "$selectedVer" ]; then
+    base_path="/data/adb/revanced/$pkgName.apk"
+    stock_path="\$(pm path $pkgName | sed -n '/base/s/package://p')"
+    {
+        echo "installedAppVer=\$installedAppVer"
+        echo "revancedAppVer=$selectedVer"
+        echo "base_path=\$base_path"
+        echo "stock_path=\$stock_path"
+        chcon -v u:object_r:apk_data_file:s0 "\$base_path"
+        mount -vo bind "\$base_path" "\$stock_path"
+    } > /storage/emulated/0/Revancify/rebootlog.txt
+fi
+EOF
+    su -c "chmod +x /data/adb/service.d/mount_revanced_$pkgName.sh"
     sleep 1
     su -c "settings list secure | sed -n -e 's/\/.*//' -e 's/default_input_method=//p' | xargs pidof | xargs kill -9 && pm resolve-activity --brief $pkgName | tail -n 1 | xargs am start -n && pidof com.termux | xargs kill -9" > /dev/null 2>&1
 }
