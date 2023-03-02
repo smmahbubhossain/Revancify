@@ -305,7 +305,7 @@ rootInstall()
         sleep 1
         mainmenu
     fi
-    cat << EOF > "/data/adb/service.d/mount_revanced_$pkgName.sh"
+    su -c cat << EOF > "/data/adb/service.d/mount_revanced_$pkgName.sh"
 #!/system/bin/sh
 while [ "\$(getprop sys.boot_completed | tr -d '\r')" != "1" ]; do sleep 1; done
 
